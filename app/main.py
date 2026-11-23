@@ -109,3 +109,18 @@ def return_book(
     book.borrower_card_number = None
     book.borrowed_at = None
     session.commit()
+
+
+@app.delete(
+    "/books/{serial_number}",
+    status_code=204,
+    response_class=Response,
+    responses={404: {"description": "Book not found"}},
+)
+def delete_book(
+    serial_number: int = Depends(parse_serial_number),
+    session: Session = Depends(get_session),
+) -> None:
+    book = get_book_for_update(serial_number, session)
+    session.delete(book)
+    session.commit()

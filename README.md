@@ -12,6 +12,8 @@ Po zmianie kodu użyj `docker compose up --build`, żeby zbudować nowy obraz.
 ## Książki
 
 - `GET /books` zwraca egzemplarze według numeru seryjnego.
+- `DELETE /books/{serial_number}` usuwa dostępny lub wypożyczony egzemplarz. Zwraca
+  `204 No Content` po usunięciu albo `404 Not Found`, jeśli egzemplarz nie istnieje.
 - `POST /books` dodaje dostępny egzemplarz. W Swagger UI użyj przykładowego JSON-a poniżej.
 
 ```json

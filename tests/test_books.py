@@ -3,6 +3,22 @@ import pytest
 BOOK = {"serial_number": 123456, "title": "Solaris", "author": "Stanisław Lem"}
 
 
+@pytest.mark.parametrize("borrowed", [False, True])
+def test_delete_book(client, borrowed):
+    assert client.post("/books", json=BOOK).status_code == 201
+    url = f"/books/{BOOK['serial_number']}"
+    if borrowed:
+        loan = client.post(f"{url}/loan", json={"borrower_card_number": 654321})
+        assert loan.status_code == 200
+
+    response = client.delete(url)
+
+    assert response.status_code == 204
+    assert response.content == b""
+    assert client.get("/books").json() == []
+    assert client.delete(url).status_code == 404
+
+
 def test_list_starts_empty(client):
     response = client.get("/books")
 

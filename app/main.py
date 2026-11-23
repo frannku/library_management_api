@@ -1,10 +1,13 @@
 from collections.abc import AsyncIterator, Sequence
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
+from pathlib import Path as FilePath
 
-from fastapi import Depends, FastAPI, HTTPException, Path, Response
+from fastapi import Depends, FastAPI, HTTPException, Path, Query, Response
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from psycopg.errors import UniqueViolation
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -28,11 +31,34 @@ async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
 
 
 app = FastAPI(title="Library management API", lifespan=lifespan)
+static_dir = FilePath(__file__).parent / "static"
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+
+@app.get("/", include_in_schema=False)
+def staff_panel() -> FileResponse:
+    return FileResponse(static_dir / "index.html")
 
 
 @app.get("/books", response_model=list[BookRead])
-def list_books(session: Session = Depends(get_session)) -> Sequence[Book]:
-    return session.scalars(select(Book).order_by(Book.serial_number)).all()
+def list_books(
+    q: str = "",
+    limit: int | None = Query(default=None, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    session: Session = Depends(get_session),
+) -> Sequence[Book]:
+    statement = select(Book)
+    term = q.strip()
+    if term:
+        matches = [
+            Book.title.icontains(term, autoescape=True),
+            Book.author.icontains(term, autoescape=True),
+        ]
+        if len(term) == 6 and term.isascii() and term.isdigit():
+            matches.append(Book.serial_number == int(term))
+        statement = statement.where(or_(*matches))
+    statement = statement.order_by(Book.serial_number).offset(offset).limit(limit)
+    return session.scalars(statement).all()
 
 
 @app.post(
@@ -66,6 +92,7 @@ def create_book(
 
 
 def get_book_for_update(serial_number: int, session: Session) -> Book:
+    # A second checkout must wait until the first transaction finishes.
     book = session.get(Book, serial_number, with_for_update=True)
     if book is None:
         raise HTTPException(status_code=404, detail="Book not found")

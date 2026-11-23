@@ -1,0 +1,24 @@
+:root { font-family: "Source Sans 3", "Segoe UI", sans-serif; color: #203830; background: #f6f5ef; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+header, main { max-width: 70rem; margin: auto; padding: 1.5rem clamp(1rem, 4vw, 3rem); }
+header { display: flex; justify-content: space-between; border-bottom: 1px solid #c9d0c6; }
+a { color: #31594d; }
+h1, h2 { font-family: "Source Serif 4", Georgia, serif; font-weight: normal; }
+h1 { font-size: clamp(2.5rem, 6vw, 4rem); margin: 1rem 0 2rem; }
+h2 { margin: 0 0 1rem; }
+section { background: #fffefa; padding: clamp(1rem, 3vw, 2rem); border: 1px solid #c9d0c6; border-radius: .5rem; }
+form, .actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: end; }
+label { display: grid; gap: .35rem; flex: 1 1 9rem; }
+input, button { font: inherit; padding: .55rem .75rem; border-radius: .3rem; }
+input { min-width: 0; border: 1px solid #83958b; }
+button { border: 1px solid #265342; background: #265342; color: white; cursor: pointer; }
+button.remove { background: transparent; color: #88392e; border-color: #c7a59d; }
+button:disabled { opacity: .6; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; text-align: left; }
+th, td { padding: .8rem .5rem; border-bottom: 1px solid #dce1d7; }
+small { display: block; margin-top: .25rem; color: #51625a; }
+#message { min-height: 1.5em; }
+#search { margin-bottom: 1rem; }
+nav { display: flex; gap: 1rem; align-items: center; margin-top: 1rem; }

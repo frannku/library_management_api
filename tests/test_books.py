@@ -3,6 +3,31 @@ import pytest
 BOOK = {"serial_number": 123456, "title": "Solaris", "author": "Stanisław Lem"}
 
 
+def test_search_and_page_boundaries(client):
+    for serial in reversed(range(100000, 100026)):
+        assert client.post("/books", json={**BOOK, "serial_number": serial}).status_code == 201
+    assert client.post("/books", json={**BOOK, "title": "Eden", "author": "Inny"}).status_code == 201
+
+    def numbers(**params):
+        response = client.get("/books", params=params)
+        assert response.status_code == 200
+        return [book["serial_number"] for book in response.json()]
+
+    first = numbers(q="oLaR", limit=26)
+    second = numbers(q="oLaR", limit=26, offset=25)
+    assert first[:25] + second == list(range(100000, 100026))
+    assert first[25:] == second
+    assert numbers(q="lEm", limit=1) == [100000]
+    assert numbers(q="123456") == [123456]
+    assert numbers(q="brak") == []
+    assert len(numbers(q=" ")) == 27
+
+
+@pytest.mark.parametrize("params", [{"limit": 0}, {"limit": 101}, {"offset": -1}])
+def test_invalid_page_parameters(client, params):
+    assert client.get("/books", params=params).status_code == 422
+
+
 @pytest.mark.parametrize("borrowed", [False, True])
 def test_delete_book(client, borrowed):
     assert client.post("/books", json=BOOK).status_code == 201

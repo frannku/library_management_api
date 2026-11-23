@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Biblioteka · Katalog</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/panel.js" defer></script>
+</head>
+<body>
+  <header><strong>Biblioteka</strong><a href="/docs">Dokumentacja API</a></header>
+  <main>
+    <h1>Katalog książek</h1>
+    <section>
+      <h2>Dodaj egzemplarz</h2>
+      <form id="add-book">
+        <label>Numer seryjny<input name="serial" inputmode="numeric" pattern="[1-9][0-9]{5}" placeholder="123456" required></label>
+        <label>Tytuł<input name="title" required></label>
+        <label>Autor<input name="author" required></label>
+        <button>Dodaj książkę</button>
+      </form>
+    </section>
+    <p id="message" role="status"></p>
+    <section>
+      <h2>Egzemplarze</h2>
+      <form id="search">
+        <label>Tytuł, autor lub numer seryjny<input type="search" name="q"></label>
+        <button>Szukaj</button>
+        <button type="button" id="export">Pobierz wyniki CSV</button>
+      </form>
+      <div class="scroll"><table aria-label="Egzemplarze">
+        <thead><tr><th>Numer</th><th>Tytuł i autor</th><th>Wypożyczenie</th><th>Akcje</th></tr></thead>
+        <tbody id="books"></tbody>
+      </table></div>
+      <p id="empty" hidden>Katalog jest pusty.</p>
+      <nav aria-label="Strony katalogu">
+        <button id="previous" disabled>Poprzednia</button>
+        <span id="page" aria-live="polite">Strona 1</span>
+        <button id="next" disabled>Następna</button>
+      </nav>
+    </section>
+  </main>
+</body>
+</html>

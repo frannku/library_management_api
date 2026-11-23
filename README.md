@@ -25,6 +25,16 @@ Po zmianie kodu użyj `docker compose up --build`, żeby zbudować nowy obraz.
 Ponowne użycie numeru seryjnego zwraca `409 Conflict`. Poprawne numery to liczby
 całkowite od `100000` do `999999`.
 
+## Wypożyczenia
+
+- `POST /books/{serial_number}/loan` wypożycza egzemplarz. Przykładowe dane to
+  `{"borrower_card_number": 654321}`. API zapisuje bieżący czas w UTC, a próba
+  wypożyczenia już wypożyczonej książki zwraca `409 Conflict`.
+- `DELETE /books/{serial_number}/loan` oznacza egzemplarz jako dostępny i czyści
+  dane wypożyczenia. Ponowny zwrot istniejącej książki również zwraca `204 No Content`.
+
+Obie operacje zwracają `404 Not Found`, jeśli egzemplarz o podanym numerze nie istnieje.
+
 ## Testy
 
 Komenda uruchamia `pytest` z PostgreSQL w osobnym projekcie Compose.
